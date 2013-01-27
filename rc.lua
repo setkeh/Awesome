@@ -163,10 +163,6 @@ local item = { l, function () wall_load(l) end }
 spacer       = wibox.widget.textbox()
 spacer:set_text(' | ')
 
---Weather Widget
-weather = wibox.widget.textbox()
-vicious.register(weather, vicious.widgets.weather, "Weather: ${city}. Sky: ${sky}. Temp: ${tempc}c Humid: ${humid}%. Wind: ${windkmh} KM/h", 1200, "YMML")
-
 --Battery Widget
 batt = wibox.widget.textbox()
 vicious.register(batt, vicious.widgets.bat, "Batt: $2% Rem: $3", 61, "BAT1")
@@ -266,7 +262,7 @@ for s = 1, screen.count() do
     mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
 
     -- Create the wibox
-    mywibox[s] = awful.wibox({ position = "top", screen = s , height = 14})
+    mywibox[s] = awful.wibox({ position = "top", screen = s , height = 18})
 
     -- Widgets that are aligned to the left
     local left_layout = wibox.layout.fixed.horizontal()
@@ -277,6 +273,9 @@ for s = 1, screen.count() do
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
+    right_layout:add(spacer)
+    right_layout:add(weatheric)
+    right_layout:add(weather)
     right_layout:add(spacer)
     right_layout:add(mailicon)
     right_layout:add(mailwidget)
@@ -314,9 +313,7 @@ for s = 1, screen.count() do
     bottom_layout:add(spacer)
     bottom_layout:add(wifiicon)
     bottom_layout:add(wifi)
-    bottom_layout:add(spacer)
-    bottom_layout:add(weather)
-    bottom_layout:add(spacer)
+
 
  -- Now bring it all together 
     --local layout = wibox.layout.align.horizontal()
@@ -352,10 +349,6 @@ globalkeys = awful.util.table.join(
             if client.focus then client.focus:raise() end
         end),
     awful.key({ }, "Print", function () awful.util.spawn("upload_screens scr") end),
-
-    awful.key({ }, "XF86AudioRaiseVolume", function () volumecfg.up(0) end),
-    awful.key({ }, "XF86AudioLowerVolume", function () volumecfg.down(0) end),
-    awful.key({ }, "XF86AudioMute", function () volumecfg.toggle() end),
 
     -- Layout manipulation
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
@@ -421,6 +414,7 @@ clientkeys = awful.util.table.join(
             c.maximized_vertical   = not c.maximized_vertical
         end)
 )
+
 
 -- Compute the maximum number of digit we need, limited to 9
 keynumber = 0

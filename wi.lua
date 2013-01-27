@@ -75,36 +75,36 @@ baticon:buttons(batpct:buttons())
 --
 -- {{{ PACMAN
 -- Icon
-pacicon = wibox.widget.imagebox()
-pacicon:set_image(beautiful.widget_pac)
+--pacicon = wibox.widget.imagebox()
+--pacicon:set_image(beautiful.widget_pac)
 --
 -- Upgrades
-pacwidget = wibox.widget.textbox()
-vicious.register(pacwidget, vicious.widgets.pkg, function(widget, args)
-   if args[1] > 0 then
-   pacicon:set_image(beautiful.widget_pacnew)
-   else
-   pacicon:set_image(beautiful.widget_pac)
-   end
+--pacwidget = wibox.widget.textbox()
+--vicious.register(pacwidget, vicious.widgets.pkg, function(widget, args)
+ --  if args[1] > 0 then
+ --  pacicon:set_image(beautiful.widget_pacnew)
+ -- else
+ --- pacicon:set_image(beautiful.widget_pac)
+ -- end
 
-  return args[1]
-  end, 1801, "Arch S") -- Arch S for ignorepkg
+--return args[1]
+--  end, 1801, "Arch S") -- Arch S for ignorepkg
 --
 -- Buttons
-  function popup_pac()
-  local pac_updates = ""
-  local f = io.popen("pacman -Sup --dbpath /tmp/pacsync")
-  if f then
-  pac_updates = f:read("*a"):match(".*/(.*)-.*\n$")
-  end
-  f:close()
-  if not pac_updates then
-  pac_updates = "System is up to date"
-  end
-  naughty.notify { text = pac_updates }
-  end
-  pacwidget:buttons(awful.util.table.join(awful.button({ }, 1, popup_pac)))
-  pacicon:buttons(pacwidget:buttons())
+--  function popup_pac()
+--  local pac_updates = ""
+--  local f = io.popen("pacman -Sup --dbpath /tmp/pacsync")
+--  if f then
+--  pac_updates = f:read("*a"):match(".*/(.*)-.*\n$")
+--  end
+--  f:close()
+--  if not pac_updates then
+--  pac_updates = "System is up to date"
+--  end
+--  naughty.notify { text = pac_updates }
+--  end
+--  pacwidget:buttons(awful.util.table.join(awful.button({ }, 1, popup_pac)))
+--  pacicon:buttons(pacwidget:buttons())
 -- End Pacman }}}
 --
 -- {{{ VOLUME
@@ -117,8 +117,7 @@ volicon:set_image(beautiful.widget_vol)
 --
 
 
--- 
-
+-- Volume Widget --
 volumecfg = {}
 volumecfg.cardid  = 0
 volumecfg.channel = "Master"
@@ -186,6 +185,22 @@ vicious.register(volpct, vicious.widgets.volume, "$1%", nil, "Master")
 --     volspace:buttons(volicon:buttons())
  -- End Volume }}}
  --
+
+--Weather Image--
+weatheric = wibox.widget.textbox()
+weatheric:set_text("☂ ")
+
+
+
+---Weather Widget
+weather = wibox.widget.textbox()
+weather_box = awful.tooltip({ objects = { weather },})
+vicious.register(weather, vicious.widgets.weather,
+   function(widgets, args)
+   weather_box:set_text("City: ".. args["{city}"] .. "\nSky: " .. args["{sky}"] .. "\nHumidity: " .. args["{humid}"] .. "%" .. "\nWind: " .. args["{windmph}"] .. " MP/h") return args["{tempf}"].." ℉" end, 
+   1200, "KLOU")
+  ---Change KLOU to yours
+
 -- {{{ Start CPU
 cpuicon = wibox.widget.imagebox()
 cpuicon:set_image(beautiful.widget_cpu)

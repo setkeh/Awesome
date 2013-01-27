@@ -9,6 +9,7 @@ home_path  = os.getenv('HOME') .. '/'
 
 theme = {}
 theme.wallpaper = awful.util.getdir("config") .. "/themes/default/bg.png"
+--theme.font          = "sans 8"
 theme.font          = "terminus 8"
 
 theme.bg_normal     = "#222222"
