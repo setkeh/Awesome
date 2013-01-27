@@ -7,7 +7,7 @@ require("awful.autofocus")
 local wibox = require("wibox")
 -- Theme handling library
 local beautiful = require("beautiful")
-beautiful.init("/home/setkeh/.config/awesome/themes/default/theme.lua")
+beautiful.init("/home/rat/.config/awesome/themes/default/theme.lua")
 -- Notification library
 local naughty = require("naughty")
 local menubar = require("menubar")
@@ -18,6 +18,8 @@ freedesktop.utils.icon_theme = 'gnome'
 --Vicious + Widgets 
 vicious = require("vicious")
 local wi = require("wi")
+local html = require("html")
+
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -45,7 +47,7 @@ end
 -- }}}
 
 -- This is used later as the default terminal and editor to run.
-terminal = "urxvt -fg green -bg black"
+terminal = "urxvt -fg white -bg black"
 editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -81,7 +83,7 @@ naughty.config.defaults.position = "top_right"
 naughty.config.defaults.margin = 8
 naughty.config.defaults.gap = 1
 naughty.config.defaults.ontop = true
-naughty.config.defaults.font = "terminus 5"
+naughty.config.defaults.font = "terminus 9"
 naughty.config.defaults.icon = nil
 naughty.config.defaults.icon_size = 256
 naughty.config.defaults.fg = beautiful.fg_tooltip
@@ -103,15 +105,22 @@ end
 -- Define a tag table which hold all screen tags.
 tags = {
  names  = { 
-         '☭:IRC',
-         '⚡:Luakit', 
-         '♨:Chrome', 
-         '☠:Vim',  
-         '☃:Vbox', 
-         '⌥:Multimedia', 
-         '⌘:Conky',
-         '✇:IDE',
-         '✣:Facepalm',
+         --'☭:IRC',
+         --'⚡:Luakit', 
+         --'♨:Chrome', 
+         --'☠:Vim',  
+         --'☃:Vbox', 
+         --'⌥:Multimedia', 
+         --'⌘:Conky',
+         --'✇:IDE',
+         --'✣:Facepalm',
+
+         '☭',
+         '⚡', 
+         '♨', 
+         '☠',  
+         '☃', 
+         '⌥',
            },
  layout = {
       layouts[5],   -- 1:irc
@@ -133,6 +142,7 @@ tags = {
 
 -- Wallpaper Changer Based On 
 -- menu icon menu pdq 07-02-2012
+ local home_path = "/home/rat/"
  local wallmenu = {}
  local function wall_load(wall)
  local f = io.popen('ln -sfn ' .. home_path .. '.config/awesome/wallpaper/' .. wall .. ' ' .. home_path .. '.config/awesome/themes/default/bg.png')
@@ -256,7 +266,7 @@ for s = 1, screen.count() do
     mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
 
     -- Create the wibox
-    mywibox[s] = awful.wibox({ position = "top", screen = s })
+    mywibox[s] = awful.wibox({ position = "top", screen = s , height = 14})
 
     -- Widgets that are aligned to the left
     local left_layout = wibox.layout.fixed.horizontal()
@@ -270,15 +280,15 @@ for s = 1, screen.count() do
     right_layout:add(spacer)
     right_layout:add(mailicon)
     right_layout:add(mailwidget)
-    right_layout:add(spacer)
-    right_layout:add(baticon)
-    right_layout:add(batpct)
-    right_layout:add(spacer)
-    right_layout:add(pacicon)
-    right_layout:add(pacwidget)
+    --right_layout:add(spacer)
+    --right_layout:add(baticon)
+    --right_layout:add(batpct)
+    --right_layout:add(spacer)
+    --right_layout:add(pacicon)
+    --right_layout:add(pacwidget)
     right_layout:add(spacer)
     right_layout:add(volicon)
-    right_layout:add(volpct)
+    right_layout:add(volumecfg.widget)
     right_layout:add(volspace)
     right_layout:add(spacer)
     right_layout:add(mytextclock)
@@ -342,6 +352,10 @@ globalkeys = awful.util.table.join(
             if client.focus then client.focus:raise() end
         end),
     awful.key({ }, "Print", function () awful.util.spawn("upload_screens scr") end),
+
+    awful.key({ }, "XF86AudioRaiseVolume", function () volumecfg.up(0) end),
+    awful.key({ }, "XF86AudioLowerVolume", function () volumecfg.down(0) end),
+    awful.key({ }, "XF86AudioMute", function () volumecfg.toggle() end),
 
     -- Layout manipulation
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
@@ -489,6 +503,12 @@ awful.rules.rules = {
 }
 -- }}}
 
+
+
+
+
+
+
 -- {{{ Signals
 -- Signal function to execute when a new client appears.
 client.connect_signal("manage", function (c, startup)
@@ -554,3 +574,16 @@ end)
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
+
+
+ --- Strip out HTML ---
+naughty.config.notify_callback = function(args)
+if(args.icon) == "gtk-dialog-info" then
+args.text = HTML_ToText(args.text)
+elseif(args.icon) == "gtk-edit" then
+args.text = HTML_ToText(args.text)
+else
+---Don't think you need this here--- 
+end
+return args
+end

@@ -9,9 +9,10 @@ local capi = {
 -- formats the lines for the notify
 local function display()
     local lines = "<u>Pacman Updates:</u>\n"
-    local f = io.popen("pacman -Qqu", "r")
+    local f = io.popen("sudo emerge -uavDN world", "r")
     local s = f:read('*all')
-    line = lines .. "\n" .. s .. "\n"
+    line = lines  "Total:" s 
+    print(line)
     f:close()
     return line
 end

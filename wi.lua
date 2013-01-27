@@ -115,21 +115,75 @@ vicious.cache(vicious.widgets.volume)
 volicon = wibox.widget.imagebox()
 volicon:set_image(beautiful.widget_vol)
 --
+
+
+-- 
+
+volumecfg = {}
+volumecfg.cardid  = 0
+volumecfg.channel = "Master"
+volumecfg.widget = wibox.widget.textbox("volumecfg.widget")
+--volumecfg.widget:set_text("")
+--volumecfg.widget = wibox.widget.textbox()
+--volumecfg.widget:set_marketup("volumecfg.widget")
+volumecfg_t = awful.tooltip({ objects = { volumecfg.widget },})
+volumecfg_t:set_text("Volume")
+ 
+-- command must start with a space!
+volumecfg.mixercommand = function (command)
+       local fd = io.popen("amixer -c" .. volumecfg.cardid .. command)
+       local status = fd:read("*all")
+       fd:close()
+ 
+       local volume = string.match(status, "(%d?%d?%d)%%")
+       volume = string.format("% 3d", volume)
+       status = string.match(status, "%[(o[^%]]*)%]")
+       if string.find(status, "on", 1, true) then
+               volume = volume .. "%"
+       else
+               volume = volume .. "M"
+       end
+       volumecfg.widget:set_text(volume)
+end
+volumecfg.update = function ()
+       volumecfg.mixercommand(" sget " .. volumecfg.channel)
+end
+volumecfg.up = function ()
+       volumecfg.mixercommand(" sset " .. volumecfg.channel .. " 1%+")
+end
+volumecfg.down = function ()
+       volumecfg.mixercommand(" sset " .. volumecfg.channel .. " 1%-")
+end
+volumecfg.toggle = function ()
+       os.execute("amixer -q sset ".. volumecfg.channel .. " toggle")
+       volumecfg.mixercommand(" sset " .. volumecfg.channel .. " 0%-")
+       --volumecfg.mixercommand(" sset " .. volumecfg.channel .. " toggle")
+end
+volumecfg.widget:buttons({
+       button({ }, 4, function () volumecfg.up() end),
+       button({ }, 5, function () volumecfg.down() end),
+       button({ }, 1, function () volumecfg.toggle() end)
+})
+volumecfg.update()
+
+
+
+
 -- Volume %
 volpct = wibox.widget.textbox()
 vicious.register(volpct, vicious.widgets.volume, "$1%", nil, "Master")
 --
 -- Buttons
-volicon:buttons(awful.util.table.join(
-     awful.button({ }, 1,
-     function() awful.util.spawn_with_shell("amixer -q set Master toggle") end),
-     awful.button({ }, 4,
-     function() awful.util.spawn_with_shell("amixer -q set Master 3+% unmute") end),
-     awful.button({ }, 5,
-     function() awful.util.spawn_with_shell("amixer -q set Master 3-% unmute") end)
-            ))
-     volpct:buttons(volicon:buttons())
-     volspace:buttons(volicon:buttons())
+--volicon:buttons(awful.util.table.join(
+     --awful.button({ }, 1,
+     --function() awful.util.spawn_with_shell("amixer -c 0 -q set Master toggle") end),
+     --awful.button({ }, 4,
+     --function() awful.util.spawn_with_shell("amixer -c 0 -q set Master 3%+ unmute") end),
+     --awful.button({ }, 5,
+    -- function() awful.util.spawn_with_shell("amixer --c 0 q set Master 3%- unmute") end)
+           -- ))
+  --   volpct:buttons(volicon:buttons())
+--     volspace:buttons(volicon:buttons())
  -- End Volume }}}
  --
 -- {{{ Start CPU
@@ -169,5 +223,5 @@ wifiicon = wibox.widget.imagebox()
 wifiicon:set_image(beautiful.widget_wifi)
 --
 wifi = wibox.widget.textbox()
-vicious.register(wifi, vicious.widgets.wifi, "${ssid} Rate: ${rate}MB/s Link: ${link}%", 3, "wlp3s0")
+vicious.register(wifi, vicious.widgets.wifi, "${ssid} Rate: ${rate}MB/s Link: ${link}%", 3, "wlan0")
 -- End Wifi }}}
