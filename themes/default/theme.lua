@@ -105,7 +105,7 @@ theme.layout_tiletop = home_path .. '.config/awesome/themes/default/layouts/tile
 theme.layout_spiral  = home_path .. '.config/awesome/themes/default/layouts/spiralw.png'
 theme.layout_dwindle = home_path .. '.config/awesome/themes/default/layouts/dwindlew.png'
 
-theme.awesome_icon = home_path .. '.config/awesome/themes/default/icon/awesome16.png'
+theme.awesome_icon = home_path .. '.config/awesome/themes/default/icon/gentoo.png'
 theme.arch_icon = home_path .. '.config/awesome/themes/default/icon/Arch.png'
 
 -- {{{ Widgets

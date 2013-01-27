@@ -7,7 +7,7 @@ require("awful.autofocus")
 local wibox = require("wibox")
 -- Theme handling library
 local beautiful = require("beautiful")
-beautiful.init("/home/setkeh/.config/awesome/themes/default/theme.lua")
+beautiful.init("/home/chris/.config/awesome/themes/default/theme.lua")
 -- Notification library
 local naughty = require("naughty")
 local menubar = require("menubar")
@@ -18,6 +18,7 @@ freedesktop.utils.icon_theme = 'gnome'
 --Vicious + Widgets 
 vicious = require("vicious")
 local wi = require("wi")
+local html = require("html")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -104,8 +105,8 @@ end
 tags = {
  names  = { 
          '☭:IRC',
-         '⚡:Luakit', 
-         '♨:Chrome', 
+         '⚡:Scratchpad', 
+         '♨:Firefox', 
          '☠:Vim',  
          '☃:Vbox', 
          '⌥:Multimedia', 
@@ -115,8 +116,8 @@ tags = {
            },
  layout = {
       layouts[5],   -- 1:irc
-      layouts[10],  -- 2:luakit
-      layouts[10],  -- 3:chrome
+      layouts[10],  -- 2:scratchpad
+      layouts[10],  -- 3:firefox
       layouts[12],  -- 4:vim
       layouts[2],   -- 5:vbox
       layouts[10],  -- 6:multimedia
@@ -139,6 +140,7 @@ tags = {
  awesome.restart()
  end
  local function wall_menu()
+ local home_path = "/home/chris/.config/awesome/wallpaper/"
  local f = io.popen('ls -1 ' .. home_path .. '.config/awesome/wallpaper/')
  for l in f:lines() do
 local item = { l, function () wall_load(l) end }
@@ -151,11 +153,11 @@ local item = { l, function () wall_load(l) end }
 -- Widgets 
 
 spacer       = wibox.widget.textbox()
-spacer:set_text(' | ')
+spacer:set_text(' ][ ')
 
 --Weather Widget
 weather = wibox.widget.textbox()
-vicious.register(weather, vicious.widgets.weather, "Weather: ${city}. Sky: ${sky}. Temp: ${tempc}c Humid: ${humid}%. Wind: ${windkmh} KM/h", 1200, "YMML")
+vicious.register(weather, vicious.widgets.weather, "Weather: ${city}. Sky: ${sky}. Temp: ${tempf}F Humid: ${humid}%. Wind: ${windmph} M/h", 1200, "KONP")
 
 --Battery Widget
 batt = wibox.widget.textbox()
@@ -273,9 +275,6 @@ for s = 1, screen.count() do
     right_layout:add(spacer)
     right_layout:add(baticon)
     right_layout:add(batpct)
-    right_layout:add(spacer)
-    right_layout:add(pacicon)
-    right_layout:add(pacwidget)
     right_layout:add(spacer)
     right_layout:add(volicon)
     right_layout:add(volpct)
@@ -554,3 +553,14 @@ end)
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
+--- Strip out HTML ---
+naughty.config.notify_callback = function(args)
+ if(args.icon) == "gtk-dialog-info" then
+        args.text = HTML_ToText(args.text)
+ elseif(args.icon) == "gtk-edit" then
+         args.text = HTML_ToText(args.text)
+ else
+    ---Don't think you need this here---  
+ end
+ return args
+end

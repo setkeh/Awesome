@@ -169,5 +169,5 @@ wifiicon = wibox.widget.imagebox()
 wifiicon:set_image(beautiful.widget_wifi)
 --
 wifi = wibox.widget.textbox()
-vicious.register(wifi, vicious.widgets.wifi, "${ssid} Rate: ${rate}MB/s Link: ${link}%", 3, "wlp3s0")
+vicious.register(wifi, vicious.widgets.wifi, "${ssid} Rate: ${rate}MB/s Link: ${link}%", 3, "eth0")
 -- End Wifi }}}
