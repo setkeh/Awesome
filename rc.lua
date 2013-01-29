@@ -8,6 +8,7 @@ local wibox = require("wibox")
 -- Theme handling library
 local beautiful = require("beautiful")
 beautiful.init("/home/rat/.config/awesome/themes/default/theme.lua")
+--Change this to your directory
 -- Notification library
 local naughty = require("naughty")
 local menubar = require("menubar")
@@ -145,7 +146,6 @@ tags = {
 
 -- Wallpaper Changer Based On 
 -- menu icon menu pdq 07-02-2012
- local home_path = "/home/rat/"
  local wallmenu = {}
  local function wall_load(wall)
  local f = io.popen('ln -sfn ' .. home_path .. '.config/awesome/wallpaper/' .. wall .. ' ' .. home_path .. '.config/awesome/themes/default/bg.png')
