@@ -121,6 +121,9 @@ tags = {
          '☠',  
          '☃', 
          '⌥',
+         '⌘',
+         '✇',
+        '✣',
            },
  layout = {
       layouts[5],   -- 1:irc
@@ -262,7 +265,7 @@ for s = 1, screen.count() do
     mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
 
     -- Create the wibox
-    mywibox[s] = awful.wibox({ position = "top", screen = s , height = 18})
+    mywibox[s] = awful.wibox({ position = "top", screen = s , height = 15.5})
 
     -- Widgets that are aligned to the left
     local left_layout = wibox.layout.fixed.horizontal()
@@ -310,6 +313,7 @@ for s = 1, screen.count() do
     bottom_layout:add(spacer)
     bottom_layout:add(memicon)
     bottom_layout:add(mem)
+--    bottom_layout:add(diskwidget)
     bottom_layout:add(spacer)
     bottom_layout:add(wifiicon)
     bottom_layout:add(wifi)
@@ -348,7 +352,17 @@ globalkeys = awful.util.table.join(
             awful.client.focus.byidx(-1)
             if client.focus then client.focus:raise() end
         end),
-    awful.key({ }, "Print", function () awful.util.spawn("upload_screens scr") end),
+    
+    awful.key({ }, "XF86AudioRaiseVolume", function () volumecfg.up(0) end),
+    awful.key({ }, "XF86AudioLowerVolume", function () volumecfg.down(0) end),
+    awful.key({ }, "XF86AudioMute", function () volumecfg.toggle() end),
+--    awful.key({modkey, }, "Z", function(w)
+--          local view = w.view
+--          local uri = view.hovered_uri or view.uri
+--          if uri then
+--             awful.util.spawn(string.format("urxvt -e youtube-viewer -I %q", uri))
+--          end
+--    end), 
 
     -- Layout manipulation
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
@@ -475,11 +489,13 @@ awful.rules.rules = {
                      buttons = clientbuttons } },
     { rule = { class = "MPlayer" },
       properties = { floating = true } },
-    { rule = { class = "pinentry" },
+    { rule = { class = "plugin-container" },
       properties = { floating = true } },
+    { rule = { class = "org-spoutcraft-launcher-Main" },
+      properties = { floating = true  } },
     { rule = { class = "gimp" },
       properties = { floating = true } },
-    { rule = { class = "Chromium" },
+    { rule = { class = "Firefox" },
       properties = { tag = tags[1][3] } },
     { rule = { class = "Vlc" },
       properties = { tag = tags[1][6] } },
@@ -487,8 +503,8 @@ awful.rules.rules = {
       properties = { tag = tags[1][5] } },
     { rule = { class = "Gns3" },
       properties = { tag = tags[1][5] } },
-    { rule = { class = "Bitcoin-qt" },
-      properties = { tag = tags[1][9] } },
+    { rule = { class = "Steam" },
+      properties = { floating = true } },
     { rule = { class = "luakit" },
       properties = { tag = tags[1][2] } },
     -- Set Firefox to always map on tags number 2 of screen 1.

@@ -11,7 +11,7 @@ local function display()
     local lines = "<u>Pacman Updates:</u>\n"
     local f = io.popen("sudo emerge -uavDN world", "r")
     local s = f:read('*all')
-    line = lines  "Total:" s 
+    line = "Total:" s 
     print(line)
     f:close()
     return line

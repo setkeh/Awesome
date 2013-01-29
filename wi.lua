@@ -3,6 +3,7 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local vicious = require("vicious")
 local naughty = require("naughty")
+local disk = require("diskusage")
 
 -- Spacers
 volspace = wibox.widget.textbox()
@@ -75,20 +76,19 @@ baticon:buttons(batpct:buttons())
 --
 -- {{{ PACMAN
 -- Icon
---pacicon = wibox.widget.imagebox()
---pacicon:set_image(beautiful.widget_pac)
+pacicon = wibox.widget.imagebox()
+pacicon:set_image(beautiful.widget_pac)
 --
 -- Upgrades
---pacwidget = wibox.widget.textbox()
---vicious.register(pacwidget, vicious.widgets.pkg, function(widget, args)
- --  if args[1] > 0 then
- --  pacicon:set_image(beautiful.widget_pacnew)
- -- else
- --- pacicon:set_image(beautiful.widget_pac)
- -- end
-
---return args[1]
---  end, 1801, "Arch S") -- Arch S for ignorepkg
+pacwidget = wibox.widget.textbox()
+vicious.register(pacwidget, vicious.widgets.pkg, function(widget, args)
+  if args[1] > 0 then
+  pacicon:set_image(beautiful.widget_pacnew)
+ else
+   pacicon:set_image(beautiful.widget_pac)
+ end
+ return args[1]
+ end, 1801, "Arch S") -- Arch S for ignorepkg
 --
 -- Buttons
 --  function popup_pac()
@@ -208,6 +208,19 @@ cpuicon:set_image(beautiful.widget_cpu)
 cpu = wibox.widget.textbox()
 vicious.register(cpu, vicious.widgets.cpu, "All: $1% 1: $1% 2: $2% 3: $3% 4: $4%", 2)
 -- End CPU }}}
+
+
+-- {{{ Start Disk Usage
+diskicon = wibox.widget.imagebox()
+diskicon:set_image(beautiful.widget_ram)
+--
+diskwidget = wibox.widget.textbox()
+diskwidget:set_text("du")
+--disk = require("diskusage")
+disk.addToWidget(diskwidget, 75, 90, true)
+--
+
+
 --
 -- {{{ Start Mem
 memicon = wibox.widget.imagebox()
