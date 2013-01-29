@@ -5,10 +5,13 @@ awful.rules = require("awful.rules")
 require("awful.autofocus")
 -- Widget and layout library
 local wibox = require("wibox")
+
 -- Theme handling library
 local beautiful = require("beautiful")
 beautiful.init("/home/rat/.config/awesome/themes/default/theme.lua")
---Change this to your directory
+--Change rat to your username
+
+
 -- Notification library
 local naughty = require("naughty")
 local menubar = require("menubar")
@@ -314,6 +317,9 @@ for s = 1, screen.count() do
     bottom_layout:add(memicon)
     bottom_layout:add(mem)
 --    bottom_layout:add(diskwidget)
+    bottom_layout:add(spacer)
+    bottom_layout:add(netwidgeticon)
+    bottom_layout:add(netwidget)
     bottom_layout:add(spacer)
     bottom_layout:add(wifiicon)
     bottom_layout:add(wifi)

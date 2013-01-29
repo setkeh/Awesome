@@ -3,7 +3,7 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local vicious = require("vicious")
 local naughty = require("naughty")
-local disk = require("diskusage")
+--local disk = require("diskusage")
 
 -- Spacers
 volspace = wibox.widget.textbox()
@@ -198,7 +198,7 @@ weather_box = awful.tooltip({ objects = { weather },})
 vicious.register(weather, vicious.widgets.weather,
    function(widgets, args)
    weather_box:set_text("City: ".. args["{city}"] .. "\nSky: " .. args["{sky}"] .. "\nHumidity: " .. args["{humid}"] .. "%" .. "\nWind: " .. args["{windmph}"] .. " MP/h") return args["{tempf}"].." ℉" end, 
-   1200, "KLOU")
+   1200, "KIND")
   ---Change KLOU to yours
 
 -- {{{ Start CPU
@@ -208,16 +208,16 @@ cpuicon:set_image(beautiful.widget_cpu)
 cpu = wibox.widget.textbox()
 vicious.register(cpu, vicious.widgets.cpu, "All: $1% 1: $1% 2: $2% 3: $3% 4: $4%", 2)
 -- End CPU }}}
-
-
--- {{{ Start Disk Usage
-diskicon = wibox.widget.imagebox()
-diskicon:set_image(beautiful.widget_ram)
---
+--{{ Disk Usage
+-- Disk usage widget
 diskwidget = wibox.widget.textbox()
-diskwidget:set_text("du")
---disk = require("diskusage")
-disk.addToWidget(diskwidget, 75, 90, true)
+--diskwidget.set_image("/home/rat/.config/awesome/du.png")
+diskwidget:set_text("test")
+disk = require("diskusage")
+-- the first argument is the widget to trigger the diskusage
+-- the second/third is the percentage at which a line gets orange/red
+-- true = show only local filesystems
+disk.addToWidget(diskwidget, 75, 90, false)
 --
 
 
@@ -246,6 +246,29 @@ vicious.register(mailwidget, vicious.widgets.gmail,
      ))
 -- End Gmail }}}
 --
+--- {{{ Start Network Monitor
+--Network Icon ↑
+netwidgeticon = wibox.widget.textbox()
+netwidgeticon:set_text("Network ↑: ")
+-- Network widget
+netwidget = awful.widget.graph()
+netwidget:set_width(45)
+netwidget:set_height(3)
+netwidget:set_background_color("#494B4F")
+netwidget:set_color("#FF5656")
+--netwidget:set_colors({type = "linear" , from = {0, 0}, stops = ({0, "} , (0.5, "} , {1, } }})
+netwidget:set_color({ type = "linear", from = { 0, 0 }, to = { 0, 20 }, stops = { { 0, "#FF5656"}, { 0.5, "#88A175" }, { 1, "#AECF96" } }})
+netwidget_t = awful.tooltip({ objects = { netwidget.widget },})
+vicious.register(netwidget, vicious.widgets.net,
+                    function (widget, args)
+                        netwidget_t:set_text("Network download: " .. args["{wlan0 down_kb}"] .. "mb/s")
+                        return args["{wlan0 down_kb}"]
+                    end)
+
+-- End Network Monitor }}
+---
+
+
 -- {{{ Start Wifi
 wifiicon = wibox.widget.imagebox()
 wifiicon:set_image(beautiful.widget_wifi)
