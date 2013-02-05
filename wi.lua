@@ -137,7 +137,7 @@ cpuicon = wibox.widget.imagebox()
 cpuicon:set_image(beautiful.widget_cpu)
 --
 cpu = wibox.widget.textbox()
-vicious.register(cpu, vicious.widgets.cpu, "All: $1% 1: $1% 2: $2% 3: $3% 4: $4%", 2)
+vicious.register(cpu, vicious.widgets.cpu, "All: $1% 1: $2% 2: $3% 3: $4% 4: $5%", 2)
 -- End CPU }}}
 --
 -- {{{ Start Mem
