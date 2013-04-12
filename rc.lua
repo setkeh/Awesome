@@ -167,7 +167,10 @@ local item = { l, function () wall_load(l) end }
 -- Widgets 
 
 spacer       = wibox.widget.textbox()
-spacer:set_text(' | ')
+spacer:set_text(' [ ')
+
+spacer2       = wibox.widget.textbox()
+spacer2:set_text(' ] ')
 
 --Battery Widget
 batt = wibox.widget.textbox()
@@ -272,32 +275,39 @@ for s = 1, screen.count() do
 
     -- Widgets that are aligned to the left
     local left_layout = wibox.layout.fixed.horizontal()
-    left_layout:add(mylauncher)
+ --   left_layout:add(mylauncher)
     left_layout:add(mytaglist[s])
     left_layout:add(mypromptbox[s])
 
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
-    if s == 1 then right_layout:add(wibox.widget.systray()) end
+    if s == 1 then right_layout:add(spacer) 
+            right_layout:add(wibox.widget.systray()) 
+            right_layout:add(spacer2) end
     right_layout:add(spacer)
     right_layout:add(weatheric)
     right_layout:add(weather)
+    right_layout:add(spacer2)
     right_layout:add(spacer)
     right_layout:add(mailicon)
     right_layout:add(mailwidget)
-    --right_layout:add(spacer)
+    --right_layout:add(spacer2)
     --right_layout:add(baticon)
     --right_layout:add(batpct)
     --right_layout:add(spacer)
     --right_layout:add(pacicon)
     --right_layout:add(pacwidget)
+    right_layout:add(spacer2)
     right_layout:add(spacer)
     right_layout:add(volicon)
     right_layout:add(volumecfg.widget)
     right_layout:add(volspace)
+    right_layout:add(spacer2)
     right_layout:add(spacer)
     right_layout:add(mytextclock)
+    right_layout:add(spacer2)
     right_layout:add(mylayoutbox[s])
+  -- right_layout:add(spacer)
 
     -- Now bring it all together (with the tasklist in the middle)
     local layout = wibox.layout.align.horizontal()
@@ -311,19 +321,23 @@ for s = 1, screen.count() do
      myinfowibox[s] = awful.wibox({ position = "bottom", screen = s })
    -- Widgets that are aligned to the bottom
     local bottom_layout = wibox.layout.fixed.horizontal()
+    bottom_layout:add(spacer)
     bottom_layout:add(cpuicon)
     bottom_layout:add(cpu)
+    bottom_layout:add(spacer2)
     bottom_layout:add(spacer)
     bottom_layout:add(memicon)
     bottom_layout:add(mem)
 --    bottom_layout:add(diskwidget)
+    bottom_layout:add(spacer2)
     bottom_layout:add(spacer)
     bottom_layout:add(netwidgeticon)
     bottom_layout:add(netwidget)
-    bottom_layout:add(spacer)
-    bottom_layout:add(wifiicon)
-    bottom_layout:add(wifi)
-
+    bottom_layout:add(spacer2)
+    --bottom_layout:add(spacer)
+    --bottom_layout:add(wifiicon)
+    --bottom_layout:add(wifi)
+    --bottom_layout:add(spacer2)
 
  -- Now bring it all together 
     --local layout = wibox.layout.align.horizontal()
@@ -383,12 +397,13 @@ globalkeys = awful.util.table.join(
                 client.focus:raise()
             end
         end),
+     awful.key({ }, "Print", function () awful.util.spawn("upload_screens scr") end),
 
     -- Standard program
     awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
     awful.key({ modkey, "Control" }, "r", awesome.restart),
     awful.key({ modkey, "Shift"   }, "q", awesome.quit),
-
+    awful.key({                   }, "XF86Mail", function () awful.util.spawn("xscreensaver-command -lock") end),
     awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)    end),
     awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)    end),
     awful.key({ modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1)      end),
@@ -397,7 +412,8 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Control" }, "l",     function () awful.tag.incncol(-1)         end),
     awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
     awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
-    awful.key({ modkey,           }, "w",     function () awful.util.spawn("luakit")    end, "Start Luakit Web Browser"),
+    awful.key({ modkey,           }, "c",     function () awful.util.spawn("snippy") end),
+    --awful.key({ modkey,           }, "w",     function () awful.util.spawn("luakit")    end, "Start Luakit Web Browser"),
 
     awful.key({ modkey, "Control" }, "n", awful.client.restore),
 
@@ -497,10 +513,16 @@ awful.rules.rules = {
       properties = { floating = true } },
     { rule = { class = "plugin-container" },
       properties = { floating = true } },
-    { rule = { class = "org-spoutcraft-launcher-Main" },
+    { rule = { class = "org-spoutcraft-launcher-Main"},
+      properties = { floating = true , tag = tags[1][2] } },
+    { rule = { class = "XCalc" },
       properties = { floating = true  } },
     { rule = { class = "gimp" },
       properties = { floating = true } },
+    { rule = { class = "feh" },
+      properties = { floating = true } },
+    { rule = { class = "Mumble" },
+      properties = { tag = tags[2][1] } },
     { rule = { class = "Firefox" },
       properties = { tag = tags[1][3] } },
     { rule = { class = "Vlc" },
@@ -603,3 +625,7 @@ else
 end
 return args
 end
+
+awful.util.spawn_with_shell("run_once xscreensaver -nosplash")
+awful.util.spawn_with_shell("run_once dropbox")
+--awful.util.spawn_with_shell("run_once mumble")

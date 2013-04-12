@@ -8,7 +8,7 @@ local awful = require("awful")
 home_path  = os.getenv('HOME') .. '/'
 
 theme = {}
-theme.wallpaper = awful.util.getdir("config") .. "/themes/default/bg.png"
+theme.wallpaper = awful.util.getdir("config") .. "/wallpaper/music.jpg"
 --theme.font          = "sans 8"
 theme.font          = "terminus 8"
 

@@ -197,16 +197,17 @@ weather = wibox.widget.textbox()
 weather_box = awful.tooltip({ objects = { weather },})
 vicious.register(weather, vicious.widgets.weather,
    function(widgets, args)
-   weather_box:set_text("City: ".. args["{city}"] .. "\nSky: " .. args["{sky}"] .. "\nHumidity: " .. args["{humid}"] .. "%" .. "\nWind: " .. args["{windmph}"] .. " MP/h") return args["{tempf}"].." ℉" end, 
-   1200, "KIND")
+   weather_box:set_text("City: ".. args["{city}"] .. "\nSky: " .. args["{sky}"] .. "\nHumidity: " .. args["{humid}"] .. "%" .. "\nWind: " .. args["{windmph}"] .. " MP/h") return args["{tempf}"].."℉" end, 
+   1200, "KLOU")
   ---Change KLOU to yours
+  --For Celsius change to {tempc} instead of {tempf}
 
 -- {{{ Start CPU
 cpuicon = wibox.widget.imagebox()
 cpuicon:set_image(beautiful.widget_cpu)
 --
 cpu = wibox.widget.textbox()
-vicious.register(cpu, vicious.widgets.cpu, "All: $1% 1: $1% 2: $2% 3: $3% 4: $4%", 2)
+vicious.register(cpu, vicious.widgets.cpu, "All: $1% 1: $2% 2: $3% 3: $4% 4: $5%", 2)
 -- End CPU }}}
 --{{ Disk Usage
 -- Disk usage widget
@@ -214,9 +215,6 @@ diskwidget = wibox.widget.textbox()
 --diskwidget.set_image("/home/rat/.config/awesome/du.png")
 diskwidget:set_text("test")
 disk = require("diskusage")
--- the first argument is the widget to trigger the diskusage
--- the second/third is the percentage at which a line gets orange/red
--- true = show only local filesystems
 disk.addToWidget(diskwidget, 75, 90, false)
 --
 
@@ -261,8 +259,9 @@ netwidget:set_color({ type = "linear", from = { 0, 0 }, to = { 0, 20 }, stops = 
 netwidget_t = awful.tooltip({ objects = { netwidget.widget },})
 vicious.register(netwidget, vicious.widgets.net,
                     function (widget, args)
-                        netwidget_t:set_text("Network download: " .. args["{wlan0 down_kb}"] .. "mb/s")
-                        return args["{wlan0 down_kb}"]
+                        netwidget_t:set_text("Network download: " .. 
+args["{wlan0 down_kb}"] .. "kb/s")
+                        return args["{wlan0 down_mb}"]
                     end)
 
 -- End Network Monitor }}
@@ -274,5 +273,5 @@ wifiicon = wibox.widget.imagebox()
 wifiicon:set_image(beautiful.widget_wifi)
 --
 wifi = wibox.widget.textbox()
-vicious.register(wifi, vicious.widgets.wifi, "${ssid} Rate: ${rate}MB/s Link: ${link}%", 3, "wlan0")
+vicious.register(wifi, vicious.widgets.wifi, "${ssid} Rate: ${rate}MB/s Link: ${link}%", 3, "wlp0s18f2u4u1")
 -- End Wifi }}}
