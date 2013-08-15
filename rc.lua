@@ -1,3 +1,6 @@
+--Configure home path so you dont have too
+home_path  = os.getenv('HOME') .. '/'
+
 -- Standard awesome library
 local gears = require("gears")
 local awful = require("awful")
@@ -7,7 +10,8 @@ require("awful.autofocus")
 local wibox = require("wibox")
 -- Theme handling library
 local beautiful = require("beautiful")
-beautiful.init("/home/setkeh/.config/awesome/themes/default/theme.lua")
+beautiful.init( awful.util.getdir("config") .. "/themes/default/theme.lua" )
+
 -- Notification library
 local naughty = require("naughty")
 local menubar = require("menubar")
