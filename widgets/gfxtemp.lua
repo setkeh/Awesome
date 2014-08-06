@@ -9,7 +9,7 @@ local capi = {
 -- formats the lines for the notify
 local function display()
     local lines = "<u>GFX Temp:</u>\n"
-    local f = io.popen("ssh setkeh@192.168.1.8 /opt/bin/aticonfig --odgt | grep Temperature | cut -c 43-52", "r")
+    local f = io.popen("/opt/bin/aticonfig --odgt | grep Temperature | cut -c 43-52", "r")
     local s = f:read('*all')
     line = lines .. "\n" .. s .. "\n"
     f:close()
