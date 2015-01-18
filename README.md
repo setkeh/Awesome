@@ -1,6 +1,8 @@
 Awesome-3.5
 ==================
 
+<img src="http://img.shields.io/gratipay/setkeh.svg">
+
 Awesome Configs updated to 3.5
 
 I have Finally cleaned up the Config slightly
