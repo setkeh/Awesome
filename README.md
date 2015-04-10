@@ -1,7 +1,7 @@
 Awesome-3.5
 ==================
 
-<img src="http://img.shields.io/gratipay/setkeh.svg">
+[![Gratipay](http://img.shields.io/gratipay/setkeh.svg)](https://gratipay.com/setkeh/)
 
 Awesome Configs updated to 3.5
 
