@@ -1,3 +1,4 @@
 [submodule "vicious"]
-        path = vicious
-	url = http://git.sysphere.org/vicious
+	path = vicious
+	url = ./vicious
+	branch = master
