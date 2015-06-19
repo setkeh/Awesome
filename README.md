@@ -19,7 +19,9 @@ Though you will still need to add these to wi.lua yourself if you intend on usin
 
 To use this config it needs to be placed in $HOME/.config/awesome the easiest way to do this is:
 
-	git clone https://github.com/setkeh/Awesome-3.5.git $HOME/.config/awesome
+	git clone --recursive https://github.com/setkeh/Awesome-3.5.git $HOME/.config/awesome
+
+The --recursive is required due to the configs reliance on vicious which i have added as a submodule. (If you have cloned the repo and the vicious directory is empty you can re clone the repo or update the submodule to ull the full repo)
 
 The config should be pretty Self explanitory though if you have issues please post an issue.
 
