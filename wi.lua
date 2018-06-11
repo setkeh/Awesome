@@ -3,141 +3,59 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local vicious = require("vicious")
 local naughty = require("naughty")
+local watch = require("awful.widget.watch")
+local gears = require("gears")
+local spawn = require("awful.spawn")
 
 -- Spacers
-volspace = wibox.widget.textbox()
-volspace:set_text(" ")
+spacer = wibox.widget.textbox()
+spacer:set_text(' | ')
 
--- {{{ BATTERY
--- Battery attributes
-local bat_state  = ""
-local bat_charge = 0
-local bat_time   = 0
-local blink      = true
-
--- Icon
-baticon = wibox.widget.imagebox()
-baticon:set_image(beautiful.widget_batfull)
-
--- Charge %
-batpct = wibox.widget.textbox()
-vicious.register(batpct, vicious.widgets.bat, function(widget, args)
-  bat_state  = args[1]
-  bat_charge = args[2]
-  bat_time   = args[3]
-
-  if args[1] == "-" then
-    if bat_charge > 70 then
-      baticon:set_image(beautiful.widget_batfull)
-    elseif bat_charge > 30 then
-      baticon:set_image(beautiful.widget_batmed)
-    elseif bat_charge > 10 then
-      baticon:set_image(beautiful.widget_batlow)
-    else
-      baticon:set_image(beautiful.widget_batempty)
-    end
-  else
-    baticon:set_image(beautiful.widget_ac)
-    if args[1] == "+" then
-      blink = not blink
-      if blink then
-        baticon:set_image(beautiful.widget_acblink)
-      end
-    end
-  end
-
-  return args[2] .. "%"
-end, nil, "BAT1")
-
--- Buttons
-function popup_bat()
-  local state = ""
-  if bat_state == "↯" then
-    state = "Full"
-  elseif bat_state == "↯" then
-    state = "Charged"
-  elseif bat_state == "+" then
-    state = "Charging"
-  elseif bat_state == "-" then
-    state = "Discharging"
-  elseif bat_state == "⌁" then
-    state = "Not charging"
-  else
-    state = "Unknown"
-  end
-
-  naughty.notify { text = "Charge : " .. bat_charge .. "%\nState  : " .. state ..
-    " (" .. bat_time .. ")", timeout = 5, hover_timeout = 0.5 }
-end
-batpct:buttons(awful.util.table.join(awful.button({ }, 1, popup_bat)))
-baticon:buttons(batpct:buttons())
--- End Battery}}}
 --
--- {{{ PACMAN
--- Icon
-pacicon = wibox.widget.imagebox()
-pacicon:set_image(beautiful.widget_pac)
---
--- Upgrades
-pacwidget = wibox.widget.textbox()
-vicious.register(pacwidget, vicious.widgets.pkg, function(widget, args)
-   if args[1] > 0 then
-   pacicon:set_image(beautiful.widget_pacnew)
-   else
-   pacicon:set_image(beautiful.widget_pac)
-   end
-
-  return args[1]
-  end, 1801, "Arch S") -- Arch S for ignorepkg
---
--- Buttons
-  function popup_pac()
-  local pac_updates = ""
-  local f = io.popen("pacman -Sup --dbpath /tmp/pacsync")
-  if f then
-  pac_updates = f:read("*a"):match(".*/(.*)-.*\n$")
-  end
-  f:close()
-  if not pac_updates then
-  pac_updates = "System is up to date"
-  end
-  naughty.notify { text = pac_updates }
-  end
-  pacwidget:buttons(awful.util.table.join(awful.button({ }, 1, popup_pac)))
-  pacicon:buttons(pacwidget:buttons())
--- End Pacman }}}
---
--- {{{ VOLUME
--- Cache
-vicious.cache(vicious.widgets.volume)
---
--- Icon
-volicon = wibox.widget.imagebox()
-volicon:set_image(beautiful.widget_vol)
---
--- Volume %
-volpct = wibox.widget.textbox()
-vicious.register(volpct, vicious.widgets.volume, "$1%", nil, "Master")
---
--- Buttons
-volicon:buttons(awful.util.table.join(
-     awful.button({ }, 1,
-     function() awful.util.spawn_with_shell("amixer -q set Master toggle") end),
-     awful.button({ }, 4,
-     function() awful.util.spawn_with_shell("amixer -q set Master 3+% unmute") end),
-     awful.button({ }, 5,
-     function() awful.util.spawn_with_shell("amixer -q set Master 3-% unmute") end)
-            ))
-     volpct:buttons(volicon:buttons())
-     volspace:buttons(volicon:buttons())
- -- End Volume }}}
- --
 -- {{{ Start CPU
 cpuicon = wibox.widget.imagebox()
 cpuicon:set_image(beautiful.widget_cpu)
 --
-cpu = wibox.widget.textbox()
-vicious.register(cpu, vicious.widgets.cpu, "All: $1% 1: $2% 2: $3% 3: $4% 4: $5%", 2)
+local cpugraph_widget = wibox.widget {
+    max_value = 100,
+    color = '#74aeab',
+    background_color = "#00000000",
+    forced_width = 50,
+    step_width = 2,
+    step_spacing = 1,
+    widget = wibox.widget.graph
+}
+
+-- mirros and pushs up a bit
+cpu_widget = wibox.container.margin(wibox.container.mirror(cpugraph_widget, { horizontal = true }), 0, 0, 0, 2)
+
+local total_prev = 0
+local idle_prev = 0
+
+watch("cat /proc/stat | grep '^cpu '", 1,
+    function(widget, stdout, stderr, exitreason, exitcode)
+        local user, nice, system, idle, iowait, irq, softirq, steal, guest, guest_nice =
+        stdout:match('(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s')
+
+        local total = user + nice + system + idle + iowait + irq + softirq + steal
+
+        local diff_idle = idle - idle_prev
+        local diff_total = total - total_prev
+        local diff_usage = (1000 * (diff_total - diff_idle) / diff_total + 5) / 10
+
+        if diff_usage > 80 then
+            widget:set_color('#ff4136')
+        else
+            widget:set_color('#74aeab')
+        end
+
+        widget:add_value(diff_usage)
+
+        total_prev = total
+        idle_prev = idle
+    end,
+    cpugraph_widget
+)
 -- End CPU }}}
 --
 -- {{{ Start Mem
@@ -147,27 +65,116 @@ memicon:set_image(beautiful.widget_ram)
 mem = wibox.widget.textbox()
 vicious.register(mem, vicious.widgets.mem, "Mem: $1% Use: $2MB Total: $3MB Free: $4MB Swap: $5%", 2)
 -- End Mem }}}
---
--- {{{ Start Gmail 
-mailicon = wibox.widget.imagebox(beautiful.widget_mail)
-mailwidget = wibox.widget.textbox()
-gmail_t = awful.tooltip({ objects = { mailwidget },})
-vicious.register(mailwidget, vicious.widgets.gmail,
-        function (widget, args)
-        gmail_t:set_text(args["{subject}"])
-        gmail_t:add_to_object(mailicon)
-            return args["{count}"]
-                 end, 120) 
 
-     mailicon:buttons(awful.util.table.join(
-         awful.button({ }, 1, function () awful.util.spawn("urxvt -e mutt", false) end)
-     ))
--- End Gmail }}}
---
--- {{{ Start Wifi
-wifiicon = wibox.widget.imagebox()
-wifiicon:set_image(beautiful.widget_wifi)
---
-wifi = wibox.widget.textbox()
-vicious.register(wifi, vicious.widgets.wifi, "${ssid} Rate: ${rate}MB/s Link: ${link}%", 3, "wlp3s0")
--- End Wifi }}}
+-- {{{ Start Volume Widget
+GET_VOLUME_CMD = 'amixer -D pulse sget Master'
+INC_VOLUME_CMD = 'amixer -D pulse sset Master 5%+'
+DEC_VOLUME_CMD = 'amixer -D pulse sset Master 5%-'
+TOG_VOLUME_CMD = 'amixer -D pulse sset Master toggle'
+
+volumearc = wibox.widget {
+    max_value = 1,
+    thickness = 2,
+    start_angle = 4.71238898, -- 2pi*3/4
+    forced_height = 17,
+    forced_width = 17,
+    bg = "#ffffff11",
+    paddings = 2,
+    widget = wibox.container.arcchart
+}
+
+volumearc_widget = wibox.container.mirror(volumearc, { horizontal = true })
+
+update_graphic = function(widget, stdout, _, _, _)
+    mute = string.match(stdout, "%[(o%D%D?)%]")
+    volume = string.match(stdout, "(%d?%d?%d)%%")
+    volume = tonumber(string.format("% 3d", volume))
+
+    widget.value = volume / 100;
+    if mute == "off" then
+        widget.colors = { beautiful.widget_red }
+    else
+        widget.colors = { beautiful.widget_main_color }
+    end
+end
+
+volumearc:connect_signal("button::press", function(_, _, _, button)
+    if (button == 4) then awful.spawn(INC_VOLUME_CMD, false)
+    elseif (button == 5) then awful.spawn(DEC_VOLUME_CMD, false)
+    elseif (button == 1) then awful.spawn(TOG_VOLUME_CMD, false)
+    end
+
+    spawn.easy_async(GET_VOLUME_CMD, function(stdout, stderr, exitreason, exitcode)
+        update_graphic(volumearc, stdout, stderr, exitreason, exitcode)
+    end)
+end)
+
+watch(GET_VOLUME_CMD, 1, update_graphic, volumearc)
+
+-- End Volume Widget }}}
+
+-- {{ Start Spotify Widget Based on https://github.com/streetturtle/awesome-wm-widgets/tree/master/spotify-widget
+SP_PATH = '/home/setkeh/.bin/sp'
+GET_SPOTIFY_STATUS_CMD = SP_PATH .. ' status'
+GET_CURRENT_SONG_CMD = SP_PATH .. ' current-oneline'
+PATH_TO_ICONS = "/usr/share/icons/Arc"
+
+spotify_widget = wibox.widget {
+    {
+        id = "icon",
+        widget = wibox.widget.imagebox,
+    },
+    {
+        id = 'current_song',
+        widget = wibox.widget.textbox,
+        font = 'Play 9'
+    },
+    layout = wibox.layout.align.horizontal,
+    set_status = function(self, is_playing)
+        if (is_playing) then
+            self.icon.image = PATH_TO_ICONS .. "/actions/24/player_play.png"
+        else
+            self.icon.image = PATH_TO_ICONS .. "/actions/24/player_pause.png"
+        end
+    end,
+    set_text = function(self, path)
+        self.current_song.markup = path
+    end,
+}
+
+update_widget_icon = function(widget, stdout, _, _, _)
+    stdout = string.gsub(stdout, "\n", "")
+    if (stdout == 'Playing') then
+        widget:set_status(true)
+    else
+        widget:set_status(false)
+    end
+end
+
+update_widget_text = function(widget, stdout, _, _, _)
+    if string.find(stdout, 'Error: Spotify is not running.') ~= nil then
+        widget:set_text('')
+        widget:set_visible(false)
+    else
+        widget:set_text(stdout)
+        widget:set_visible(true)
+    end
+end
+
+watch(GET_SPOTIFY_STATUS_CMD, 1, update_widget_icon, spotify_widget)
+watch(GET_CURRENT_SONG_CMD, 1, update_widget_text, spotify_widget)
+
+--- Adds mouse controls to the widget:
+--  - left click - play/pause
+--  - scroll up - play next song
+--  - scroll down - play previous song
+spotify_widget:connect_signal("button::press", function(_, _, _, button)
+    if (button == 1) then awful.spawn(SP_PATH .. " play", false)      -- left click
+    elseif (button == 4) then awful.spawn(SP_PATH .. " next", false)  -- scroll up
+    elseif (button == 5) then awful.spawn(SP_PATH .. " prev", false)  -- scroll down
+    end
+    awful.spawn.easy_async(GET_SPOTIFY_STATUS_CMD, function(stdout, stderr, exitreason, exitcode)
+        update_widget_icon(spotify_widget, stdout, stderr, exitreason, exitcode)
+    end)
+end)
+-- End Spotify Widget}}

@@ -22,6 +22,7 @@ freedesktop.utils.icon_theme = 'gnome'
 --Vicious + Widgets 
 vicious = require("vicious")
 local wi = require("wi")
+require("cpu-widget.cpu-widget")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -49,7 +50,7 @@ end
 -- }}}
 
 -- This is used later as the default terminal and editor to run.
-terminal = "urxvt -fg green -bg black"
+terminal = "st"
 editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -107,26 +108,20 @@ end
 -- Define a tag table which hold all screen tags.
 tags = {
  names  = { 
-         '☭:IRC',
-         '⚡:Luakit', 
-         '♨:Chrome', 
-         '☠:Vim',  
-         '☃:Vbox', 
-         '⌥:Multimedia', 
-         '⌘:Conky',
          '✇:IDE',
+         '☭:Web',
+         '☭:Terminal', 
+         '♨:IRC',
+         '⌥:Social',
          '✣:Facepalm',
            },
  layout = {
-      layouts[5],   -- 1:irc
-      layouts[10],  -- 2:luakit
-      layouts[10],  -- 3:chrome
-      layouts[12],  -- 4:vim
-      layouts[2],   -- 5:vbox
-      layouts[10],  -- 6:multimedia
-      layouts[10],  -- 7:conky
-      layouts[2],   -- 8:ide
-      layouts[10],  -- 9:facepalm
+      layouts[5],   -- 1:IDE
+      layouts[10],  -- 2:Web
+      layouts[10],  -- 3:Terminal
+      layouts[12],  -- 4:IRC
+      layouts[1],   -- 5:Social
+      layouts[2],   -- 6:Facepalm
           }
        }
   for s = 1, screen.count() do
@@ -151,20 +146,6 @@ local item = { l, function () wall_load(l) end }
  f:close()
  end
  wall_menu()
-
--- Widgets 
-
-spacer       = wibox.widget.textbox()
-spacer:set_text(' | ')
-
---Weather Widget
-weather = wibox.widget.textbox()
-vicious.register(weather, vicious.widgets.weather, "Weather: ${city}. Sky: ${sky}. Temp: ${tempc}c Humid: ${humid}%. Wind: ${windkmh} KM/h", 1200, "YMML")
-
---Battery Widget
-batt = wibox.widget.textbox()
-vicious.register(batt, vicious.widgets.bat, "Batt: $2% Rem: $3", 61, "BAT1")
-
 
 -- {{{ Menu
 -- Create a laucher widget and a main menu
@@ -272,18 +253,9 @@ for s = 1, screen.count() do
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
     right_layout:add(spacer)
-    right_layout:add(mailicon)
-    right_layout:add(mailwidget)
+    right_layout:add(volumearc_widget)
     right_layout:add(spacer)
-    right_layout:add(baticon)
-    right_layout:add(batpct)
-    right_layout:add(spacer)
-    right_layout:add(pacicon)
-    right_layout:add(pacwidget)
-    right_layout:add(spacer)
-    right_layout:add(volicon)
-    right_layout:add(volpct)
-    right_layout:add(volspace)
+    right_layout:add(spotify_widget)
     right_layout:add(spacer)
     right_layout:add(mytextclock)
     right_layout:add(mylayoutbox[s])
@@ -301,15 +273,10 @@ for s = 1, screen.count() do
    -- Widgets that are aligned to the bottom
     local bottom_layout = wibox.layout.fixed.horizontal()
     bottom_layout:add(cpuicon)
-    bottom_layout:add(cpu)
+    bottom_layout:add(cpu_widget)
     bottom_layout:add(spacer)
     bottom_layout:add(memicon)
     bottom_layout:add(mem)
-    bottom_layout:add(spacer)
-    bottom_layout:add(wifiicon)
-    bottom_layout:add(wifi)
-    bottom_layout:add(spacer)
-    bottom_layout:add(weather)
     bottom_layout:add(spacer)
 
  -- Now bring it all together 
@@ -330,7 +297,7 @@ root.buttons(awful.util.table.join(
 -- }}}
 
 -- {{{ Key bindings
-globalkeys = awful.util.table.join(
+globalkeys = gears.table.join(
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore),
@@ -392,7 +359,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey }, "p", function() menubar.show() end)
 )
 
-clientkeys = awful.util.table.join(
+clientkeys = gears.table.join(
     awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
     awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
     awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
