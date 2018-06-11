@@ -1,5 +1,9 @@
-Awesome Window Manager Configs
+Awesome-3.5
 ==================
+
+[![Gratipay](http://img.shields.io/gratipay/setkeh.svg)](https://gratipay.com/setkeh/)
+
+Awesome Configs updated to 3.5
 
 I have Finally cleaned up the Config slightly
 
@@ -15,7 +19,7 @@ Though you will still need to add these to wi.lua yourself if you intend on usin
 
 To use this config it needs to be placed in $HOME/.config/awesome the easiest way to do this is:
 
-	git clone --recursive https://github.com/setkeh/Awesome.git $HOME/.config/awesome
+	git clone --recursive https://github.com/setkeh/Awesome-3.5.git $HOME/.config/awesome
 
 The --recursive is required due to the configs reliance on vicious which i have added as a submodule. (If you have cloned the repo and the vicious directory is empty you can re clone the repo or update the submodule to ull the full repo)
 
