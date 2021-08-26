@@ -2,3 +2,6 @@
 	path = vicious
 	url = http://git.sysphere.org/vicious/
 	branch = master
+[submodule "freedesktop"]
+	path = freedesktop
+	url = https://github.com/lcpz/awesome-freedesktop.git
